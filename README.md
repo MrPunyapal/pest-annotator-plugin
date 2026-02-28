@@ -4,8 +4,8 @@ A [Pest PHP](https://pestphp.com) plugin that automatically annotates uncovered 
 
 ## Requirements
 
-- PHP 8.2+ (PHP 8.3+ for Pest 4)
-- Pest PHP 3.0+ or 4.0+
+- PHP 8.3+
+- Pest PHP 4.0+
 - A code coverage driver (Xdebug, PCOV, or PHPDBG)
 
 ## Installation

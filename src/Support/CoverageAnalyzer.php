@@ -34,11 +34,8 @@ final class CoverageAnalyzer
     private function extractClasses(File $file, array &$classes): void
     {
         foreach ($file->classes() as $className => $classData) {
-            $namespace = is_array($classData) ? $classData['namespace'] : $classData->namespace;
-            $methods = is_array($classData) ? $classData['methods'] : $classData->methods;
-
-            $fqcn = $this->resolveClassName((string) $className, $namespace);
-            $extractedMethods = $this->extractMethods($methods);
+            $fqcn = $this->resolveClassName((string) $className, $classData->namespace);
+            $extractedMethods = $this->extractMethods($classData->methods);
 
             if ($extractedMethods === []) {
                 continue;
@@ -56,11 +53,8 @@ final class CoverageAnalyzer
     private function extractTraits(File $file, array &$classes): void
     {
         foreach ($file->traits() as $traitName => $traitData) {
-            $namespace = is_array($traitData) ? $traitData['namespace'] : $traitData->namespace;
-            $methods = is_array($traitData) ? $traitData['methods'] : $traitData->methods;
-
-            $fqcn = $this->resolveClassName((string) $traitName, $namespace);
-            $extractedMethods = $this->extractMethods($methods);
+            $fqcn = $this->resolveClassName((string) $traitName, $traitData->namespace);
+            $extractedMethods = $this->extractMethods($traitData->methods);
 
             if ($extractedMethods === []) {
                 continue;
@@ -88,7 +82,7 @@ final class CoverageAnalyzer
     }
 
     /**
-     * @param  array<string, array{executableLines: int, executedLines: int}|object{executableLines: int, executedLines: int}>  $methods
+     * @param  array<string, object{executableLines: int, executedLines: int}>  $methods
      * @return array<string, bool>
      */
     private function extractMethods(array $methods): array
@@ -96,14 +90,11 @@ final class CoverageAnalyzer
         $result = [];
 
         foreach ($methods as $methodName => $methodData) {
-            $executableLines = is_array($methodData) ? $methodData['executableLines'] : $methodData->executableLines;
-
-            if ($executableLines === 0) {
+            if ($methodData->executableLines === 0) {
                 continue;
             }
 
-            $executedLines = is_array($methodData) ? $methodData['executedLines'] : $methodData->executedLines;
-            $result[$methodName] = $executedLines > 0;
+            $result[$methodName] = $methodData->executedLines > 0;
         }
 
         return $result;
