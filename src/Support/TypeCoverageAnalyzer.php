@@ -48,10 +48,6 @@ final class TypeCoverageAnalyzer
 
             $className = $this->extractClassName($filePath, $code);
 
-            if ($className === null) {
-                continue;
-            }
-
             $classes[$className] = new ClassTypeCoverage(
                 className: $className,
                 filePath: $filePath,

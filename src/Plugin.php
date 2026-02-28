@@ -110,10 +110,10 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
             return;
         }
 
-        $filePaths = array_unique(array_map(
+        $filePaths = array_values(array_unique(array_map(
             static fn (ClassCoverage $class): string => $class->filePath,
             $report->classes,
-        ));
+        )));
 
         $analyzer = new TypeCoverageAnalyzer;
         $typeReport = $analyzer->analyze($filePaths);
@@ -130,10 +130,10 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
             return;
         }
 
-        $filePaths = array_unique(array_map(
+        $filePaths = array_values(array_unique(array_map(
             static fn (ClassCoverage $class): string => $class->filePath,
             $report->classes,
-        ));
+        )));
 
         $analyzer = new ComplexityAnalyzer;
         $complexityReport = $analyzer->analyze($filePaths, $report);

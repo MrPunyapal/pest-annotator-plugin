@@ -56,7 +56,7 @@ final class BaselineManager
             return [];
         }
 
-        /** @var array<string, array{coverage: float, lineCoverage: float, methods: array<string, float>}> $data */
+        /** @var array<string, array{coverage: float, lineCoverage: float, methods: array<string, float>}>|null $data */
         $data = json_decode($content, true);
 
         if (! is_array($data)) {
@@ -66,7 +66,7 @@ final class BaselineManager
         $result = [];
 
         foreach ($data as $fqcn => $classData) {
-            $result[$fqcn] = $classData['coverage'] ?? 0.0;
+            $result[$fqcn] = $classData['coverage'];
         }
 
         return $result;
