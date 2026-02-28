@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PestCoverageAnnotator\Data;
+namespace PestAnnotator\Data;
 
 final readonly class ClassCoverage
 {

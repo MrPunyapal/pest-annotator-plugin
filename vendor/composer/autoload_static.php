@@ -7,8 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInit815d72049c1ea36bfb27498ab58ec783
 {
     public static $files = array (
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
@@ -60,8 +60,8 @@ class ComposerStaticInit815d72049c1ea36bfb27498ab58ec783
             'Pest\\Mutate\\' => 12,
             'Pest\\Arch\\' => 10,
             'Pest\\' => 5,
-            'PestCoverageAnnotator\\Tests\\' => 28,
-            'PestCoverageAnnotator\\' => 22,
+            'PestAnnotator\\Tests\\' => 20,
+            'PestAnnotator\\' => 14,
             'ParaTest\\' => 9,
             'PHPUnit\\Architecture\\' => 21,
             'PHPStan\\PhpDocParser\\' => 21,
@@ -178,11 +178,11 @@ class ComposerStaticInit815d72049c1ea36bfb27498ab58ec783
         array (
             0 => __DIR__ . '/..' . '/pestphp/pest/src',
         ),
-        'PestCoverageAnnotator\\Tests\\' =>
+        'PestAnnotator\\Tests\\' =>
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
-        'PestCoverageAnnotator\\' =>
+        'PestAnnotator\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

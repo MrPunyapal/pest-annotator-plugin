@@ -3270,50 +3270,42 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.6",
-            "version_normalized": "7.4.6.0",
+            "version": "v8.0.6",
+            "version_normalized": "8.0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27"
+                "reference": "488285876e807a4777f074041d8bb508623419fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/6d643a93b47398599124022eb24d97c153c12f27",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27",
+                "url": "https://api.github.com/repos/symfony/console/zipball/488285876e807a4777f074041d8bb508623419fa",
+                "reference": "488285876e807a4777f074041d8bb508623419fa",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3",
-                "symfony/polyfill-mbstring": "~1.0",
+                "php": ">=8.4",
+                "symfony/polyfill-mbstring": "^1.0",
                 "symfony/service-contracts": "^2.5|^3",
-                "symfony/string": "^7.2|^8.0"
-            },
-            "conflict": {
-                "symfony/dependency-injection": "<6.4",
-                "symfony/dotenv": "<6.4",
-                "symfony/event-dispatcher": "<6.4",
-                "symfony/lock": "<6.4",
-                "symfony/process": "<6.4"
+                "symfony/string": "^7.4|^8.0"
             },
             "provide": {
                 "psr/log-implementation": "1.0|2.0|3.0"
             },
             "require-dev": {
                 "psr/log": "^1|^2|^3",
-                "symfony/config": "^6.4|^7.0|^8.0",
-                "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-                "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
-                "symfony/http-foundation": "^6.4|^7.0|^8.0",
-                "symfony/http-kernel": "^6.4|^7.0|^8.0",
-                "symfony/lock": "^6.4|^7.0|^8.0",
-                "symfony/messenger": "^6.4|^7.0|^8.0",
-                "symfony/process": "^6.4|^7.0|^8.0",
-                "symfony/stopwatch": "^6.4|^7.0|^8.0",
-                "symfony/var-dumper": "^6.4|^7.0|^8.0"
+                "symfony/config": "^7.4|^8.0",
+                "symfony/dependency-injection": "^7.4|^8.0",
+                "symfony/event-dispatcher": "^7.4|^8.0",
+                "symfony/http-foundation": "^7.4|^8.0",
+                "symfony/http-kernel": "^7.4|^8.0",
+                "symfony/lock": "^7.4|^8.0",
+                "symfony/messenger": "^7.4|^8.0",
+                "symfony/process": "^7.4|^8.0",
+                "symfony/stopwatch": "^7.4|^8.0",
+                "symfony/var-dumper": "^7.4|^8.0"
             },
-            "time": "2026-02-25T17:02:47+00:00",
+            "time": "2026-02-25T16:59:43+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -3347,7 +3339,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.6"
+                "source": "https://github.com/symfony/console/tree/v8.0.6"
             },
             "funding": [
                 {
@@ -4302,7 +4294,6 @@
         "nunomaduro/collision",
         "nunomaduro/termwind",
         "pestphp/pest",
-        "pestphp/pest-plugin",
         "pestphp/pest-plugin-arch",
         "pestphp/pest-plugin-mutate",
         "phar-io/manifest",
@@ -4318,6 +4309,7 @@
         "phpunit/php-text-template",
         "phpunit/php-timer",
         "phpunit/phpunit",
+        "psr/container",
         "psr/log",
         "psr/simple-cache",
         "rector/rector",
@@ -4337,8 +4329,16 @@
         "sebastian/type",
         "sebastian/version",
         "staabm/side-effects-detector",
+        "symfony/console",
+        "symfony/deprecation-contracts",
         "symfony/finder",
+        "symfony/polyfill-ctype",
+        "symfony/polyfill-intl-grapheme",
+        "symfony/polyfill-intl-normalizer",
+        "symfony/polyfill-mbstring",
         "symfony/process",
+        "symfony/service-contracts",
+        "symfony/string",
         "ta-tikoma/phpunit-architecture-test",
         "theseer/tokenizer",
         "webmozart/assert"

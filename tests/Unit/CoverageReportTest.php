@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use PestCoverageAnnotator\Data\ClassCoverage;
-use PestCoverageAnnotator\Data\CoverageReport;
+use PestAnnotator\Data\ClassCoverage;
+use PestAnnotator\Data\CoverageReport;
 
 it('categorizes classes correctly', function (): void {
     $report = new CoverageReport([

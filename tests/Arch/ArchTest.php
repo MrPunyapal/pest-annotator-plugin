@@ -2,20 +2,26 @@
 
 declare(strict_types=1);
 
+use PestAnnotator\Plugin;
+
 arch('source files use strict types')
-    ->expect('PestCoverageAnnotator')
+    ->expect('PestAnnotator')
     ->toUseStrictTypes();
 
 arch('data objects are readonly')
-    ->expect('PestCoverageAnnotator\Data')
+    ->expect('PestAnnotator\Data')
     ->toBeReadonly();
 
-arch('parsers are final')
-    ->expect('PestCoverageAnnotator\Parsers')
+arch('renderers are final')
+    ->expect('PestAnnotator\Renderers')
     ->toBeFinal();
 
-arch('commands are final')
-    ->expect('PestCoverageAnnotator\Commands')
+arch('support classes are final')
+    ->expect('PestAnnotator\Support')
+    ->toBeFinal();
+
+arch('plugin is final')
+    ->expect(Plugin::class)
     ->toBeFinal();
 
 arch('no debugging functions')

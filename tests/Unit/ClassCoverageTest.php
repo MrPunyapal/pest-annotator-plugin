@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use PestCoverageAnnotator\Data\ClassCoverage;
+use PestAnnotator\Data\ClassCoverage;
 
 it('reports fully covered when all methods are covered', function (): void {
     $class = new ClassCoverage(

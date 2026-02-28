@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
-        'name' => 'mrpunyapal/pest-coverage-annotator',
+        'name' => 'mrpunyapal/pest-annotator',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b8ae08125b062e53e8caba095d4107366a6bd5c1',
+        'reference' => 'fd632fae5f54541f19be0f0482850fc511f30204',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -64,10 +64,10 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
-        'mrpunyapal/pest-coverage-annotator' => array(
+        'mrpunyapal/pest-annotator' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b8ae08125b062e53e8caba095d4107366a6bd5c1',
+            'reference' => 'fd632fae5f54541f19be0f0482850fc511f30204',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -125,7 +125,7 @@
             'type' => 'composer-plugin',
             'install_path' => __DIR__ . '/../pestphp/pest-plugin',
             'aliases' => array(),
-            'dev_requirement' => true,
+            'dev_requirement' => false,
         ),
         'pestphp/pest-plugin-arch' => array(
             'pretty_version' => 'v3.1.1',
@@ -269,7 +269,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../psr/container',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'psr/log' => array(
             'pretty_version' => '3.0.2',
@@ -281,7 +281,7 @@
             'dev_requirement' => true,
         ),
         'psr/log-implementation' => array(
-            'dev_requirement' => false,
+            'dev_requirement' => true,
             'provided' => array(
                 0 => '1.0|2.0|3.0',
             ),
@@ -449,13 +449,13 @@
             'dev_requirement' => true,
         ),
         'symfony/console' => array(
-            'pretty_version' => 'v7.4.6',
-            'version' => '7.4.6.0',
-            'reference' => '6d643a93b47398599124022eb24d97c153c12f27',
+            'pretty_version' => 'v8.0.6',
+            'version' => '8.0.6.0',
+            'reference' => '488285876e807a4777f074041d8bb508623419fa',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/console',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/deprecation-contracts' => array(
             'pretty_version' => 'v3.6.0',
@@ -464,7 +464,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/deprecation-contracts',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/finder' => array(
             'pretty_version' => 'v8.0.6',
@@ -482,7 +482,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-ctype',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/polyfill-intl-grapheme' => array(
             'pretty_version' => 'v1.33.0',
@@ -491,7 +491,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-intl-grapheme',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/polyfill-intl-normalizer' => array(
             'pretty_version' => 'v1.33.0',
@@ -500,7 +500,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-intl-normalizer',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/polyfill-mbstring' => array(
             'pretty_version' => 'v1.33.0',
@@ -509,7 +509,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-mbstring',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/process' => array(
             'pretty_version' => 'v8.0.5',
@@ -527,7 +527,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/service-contracts',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'symfony/string' => array(
             'pretty_version' => 'v8.0.6',
@@ -536,7 +536,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/string',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
         'ta-tikoma/phpunit-architecture-test' => array(
             'pretty_version' => '0.8.7',

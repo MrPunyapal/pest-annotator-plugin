@@ -2,44 +2,19 @@
 
 declare(strict_types=1);
 
-namespace PestCoverageAnnotator;
+namespace PestAnnotator\Renderers;
 
-use PestCoverageAnnotator\Data\ClassCoverage;
-use PestCoverageAnnotator\Data\CoverageReport;
-use PestCoverageAnnotator\Parsers\CoverageParser;
+use PestAnnotator\Data\ClassCoverage;
+use PestAnnotator\Data\CoverageReport;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final readonly class Annotator
+final class CoverageRenderer
 {
-    public function __construct(
-        private CoverageParser $parser = new CoverageParser,
-    ) {}
-
-    /** @param array<int, string> $includePrefixes */
-    public function annotate(
-        string $coveragePath,
-        OutputInterface $output,
-        array $includePrefixes = ['app/', 'src/'],
-        bool $showCovered = false,
-    ): CoverageReport {
-        $report = $this->parser->parse($coveragePath, $includePrefixes);
-
-        if ($report->totalClasses() === 0) {
-            $output->writeln('<comment>No classes found in coverage report matching the given filters.</comment>');
-
-            return $report;
-        }
-
+    public function render(CoverageReport $report, OutputInterface $output): void
+    {
         $this->renderUncoveredClasses($report, $output);
         $this->renderPartiallyCoveredClasses($report, $output);
-
-        if ($showCovered) {
-            $this->renderFullyCoveredClasses($report, $output);
-        }
-
         $this->renderSummary($report, $output);
-
-        return $report;
     }
 
     private function renderUncoveredClasses(CoverageReport $report, OutputInterface $output): void
@@ -73,25 +48,6 @@ final readonly class Annotator
 
         foreach ($partial as $class) {
             $this->renderClassBlock($class, $output);
-        }
-    }
-
-    private function renderFullyCoveredClasses(CoverageReport $report, OutputInterface $output): void
-    {
-        $covered = $report->fullyCoveredClasses();
-
-        if ($covered === []) {
-            return;
-        }
-
-        $output->writeln('');
-        $output->writeln('<fg=green;options=bold>━━━ Fully Covered Classes ━━━</>');
-        $output->writeln('');
-
-        foreach ($covered as $class) {
-            $output->writeln(sprintf('  📄 <fg=green>Class: %s</>', $class->className));
-            $output->writeln('     ✅ <fg=green>Fully Covered</>');
-            $output->writeln('');
         }
     }
 
