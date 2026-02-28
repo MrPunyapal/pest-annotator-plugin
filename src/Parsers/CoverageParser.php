@@ -9,17 +9,14 @@ use DOMElement;
 use DOMNodeList;
 use DOMXPath;
 use InvalidArgumentException;
+use LibXMLError;
 use PestCoverageAnnotator\Data\ClassCoverage;
 use PestCoverageAnnotator\Data\CoverageReport;
 use RuntimeException;
 
 final class CoverageParser
 {
-    /**
-     * Parses a Clover XML coverage file and returns a structured report.
-     *
-     * @param array<int, string> $includePrefixes directory prefixes to include (e.g. ['app/', 'src/'])
-     */
+    /** @param array<int, string> $includePrefixes directory prefixes to include (e.g. ['app/', 'src/']) */
     public function parse(string $xmlPath, array $includePrefixes = ['app/', 'src/']): CoverageReport
     {
         $this->validateFile($xmlPath);
@@ -57,17 +54,17 @@ final class CoverageParser
     private function validateFile(string $xmlPath): void
     {
         if (! file_exists($xmlPath)) {
-            throw new InvalidArgumentException("Coverage file not found: {$xmlPath}");
+            throw new InvalidArgumentException('Coverage file not found: '.$xmlPath);
         }
 
         if (! is_readable($xmlPath)) {
-            throw new InvalidArgumentException("Coverage file is not readable: {$xmlPath}");
+            throw new InvalidArgumentException('Coverage file is not readable: '.$xmlPath);
         }
     }
 
     private function loadXml(string $xmlPath): DOMDocument
     {
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
 
         $previousErrorSetting = libxml_use_internal_errors(true);
 
@@ -79,23 +76,19 @@ final class CoverageParser
 
         if (! $loaded || $errors !== []) {
             $errorMessages = array_map(
-                static fn ($error): string => trim($error->message),
+                static fn (LibXMLError $error): string => trim($error->message),
                 $errors,
             );
 
             throw new RuntimeException(
-                'Failed to parse coverage XML: ' . implode(', ', $errorMessages)
+                'Failed to parse coverage XML: '.implode(', ', $errorMessages)
             );
         }
 
         return $dom;
     }
 
-    /**
-     * Determines whether a file path matches any of the include prefixes.
-     *
-     * @param array<int, string> $includePrefixes
-     */
+    /** @param array<int, string> $includePrefixes */
     private function shouldIncludeFile(string $filePath, array $includePrefixes): bool
     {
         $normalizedPath = str_replace('\\', '/', $filePath);
@@ -103,7 +96,7 @@ final class CoverageParser
         foreach ($includePrefixes as $prefix) {
             $normalizedPrefix = str_replace('\\', '/', $prefix);
 
-            if (str_contains($normalizedPath, "/{$normalizedPrefix}")) {
+            if (str_contains($normalizedPath, '/'.$normalizedPrefix)) {
                 return true;
             }
         }
@@ -111,11 +104,7 @@ final class CoverageParser
         return false;
     }
 
-    /**
-     * Parses a single <file> node and populates the classes array.
-     *
-     * @param array<string, ClassCoverage> $classes
-     */
+    /** @param array<string, ClassCoverage> $classes */
     private function parseFileNode(DOMElement $fileNode, DOMXPath $xpath, string $filePath, array &$classes): void
     {
         $classNodes = $xpath->query('class', $fileNode);
@@ -124,7 +113,7 @@ final class CoverageParser
             return;
         }
 
-        $coveredLines = $this->extractCoveredLines($xpath, $fileNode);
+        $this->extractCoveredLines($xpath, $fileNode);
 
         foreach ($classNodes as $classNode) {
             if (! $classNode instanceof DOMElement) {
@@ -133,11 +122,15 @@ final class CoverageParser
 
             $className = $this->resolveClassName($classNode);
 
-            if ($className === '' || $className === '{anonymous}') {
+            if ($className === '') {
                 continue;
             }
 
-            $methods = $this->extractMethods($xpath, $fileNode, $coveredLines);
+            if ($className === '{anonymous}') {
+                continue;
+            }
+
+            $methods = $this->extractMethods($xpath, $fileNode);
 
             if ($methods === []) {
                 continue;
@@ -151,11 +144,7 @@ final class CoverageParser
         }
     }
 
-    /**
-     * Extracts line coverage data from a file node.
-     *
-     * @return array<int, int> line number => hit count
-     */
+    /** @return array<int, int> line number => hit count */
     private function extractCoveredLines(DOMXPath $xpath, DOMElement $fileNode): array
     {
         $lineNodes = $xpath->query('line[@type="stmt" or @type="method"]', $fileNode);
@@ -182,19 +171,16 @@ final class CoverageParser
         $name = $classNode->getAttribute('name');
 
         if ($namespace !== '' && $namespace !== 'global') {
-            return $namespace . '\\' . $name;
+            return $namespace.'\\'.$name;
         }
 
         return $name;
     }
 
     /**
-     * Extracts methods and their coverage status from a file node.
-     *
-     * @param array<int, int> $coveredLines
      * @return array<string, bool>
      */
-    private function extractMethods(DOMXPath $xpath, DOMElement $fileNode, array $coveredLines): array
+    private function extractMethods(DOMXPath $xpath, DOMElement $fileNode): array
     {
         $methodNodes = $xpath->query('line[@type="method"]', $fileNode);
         $methods = [];

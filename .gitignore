@@ -1,0 +1,11 @@
+/vendor/
+/build/
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/composer.lock
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -6,11 +6,7 @@ namespace PestCoverageAnnotator\Data;
 
 final readonly class CoverageReport
 {
-    /**
-     * Holds the full parsed coverage report.
-     *
-     * @param array<string, ClassCoverage> $classes keyed by fully-qualified class name
-     */
+    /** @param array<string, ClassCoverage> $classes keyed by fully-qualified class name */
     public function __construct(
         public array $classes,
     ) {}

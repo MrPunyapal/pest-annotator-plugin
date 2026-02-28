@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace PestCoverageAnnotator\Commands;
 
+use InvalidArgumentException;
 use PestCoverageAnnotator\Annotator;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,9 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class AnnotateCommand extends Command
 {
-
     public function __construct(
-        private readonly Annotator $annotator = new Annotator(),
+        private readonly Annotator $annotator = new Annotator,
     ) {
         parent::__construct();
     }
@@ -61,7 +62,7 @@ final class AnnotateCommand extends Command
 
         $output->writeln('');
         $output->writeln('<fg=cyan;options=bold>🔍 Pest Coverage Annotator</>');
-        $output->writeln("<fg=gray>   Parsing: {$coverageFile}</>");
+        $output->writeln(sprintf('<fg=gray>   Parsing: %s</>', $coverageFile));
 
         try {
             $report = $this->annotator->annotate(
@@ -70,9 +71,9 @@ final class AnnotateCommand extends Command
                 includePrefixes: $includePrefixes,
                 showCovered: $showCovered,
             );
-        } catch (\InvalidArgumentException|\RuntimeException $e) {
+        } catch (InvalidArgumentException|RuntimeException $e) {
             $output->writeln('');
-            $output->writeln("<error> ERROR </error> <fg=red>{$e->getMessage()}</>");
+            $output->writeln(sprintf('<error> ERROR </error> <fg=red>%s</>', $e->getMessage()));
             $output->writeln('');
 
             return Command::FAILURE;

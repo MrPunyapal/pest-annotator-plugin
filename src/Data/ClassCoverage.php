@@ -6,11 +6,7 @@ namespace PestCoverageAnnotator\Data;
 
 final readonly class ClassCoverage
 {
-    /**
-     * Holds coverage data for a single class.
-     *
-     * @param array<string, bool> $methods method name => covered flag
-     */
+    /** @param array<string, bool> $methods method name => covered flag */
     public function __construct(
         public string $className,
         public string $filePath,
@@ -35,11 +31,7 @@ final readonly class ClassCoverage
         return ! in_array(true, $this->methods, true);
     }
 
-    /**
-     * Returns method names that have no coverage.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public function uncoveredMethods(): array
     {
         return array_keys(array_filter(
@@ -48,11 +40,7 @@ final readonly class ClassCoverage
         ));
     }
 
-    /**
-     * Returns method names that are covered.
-     *
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     public function coveredMethods(): array
     {
         return array_keys(array_filter(

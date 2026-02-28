@@ -6,8 +6,8 @@ use PestCoverageAnnotator\Parsers\CoverageParser;
 
 describe('CoverageParser', function (): void {
     it('parses a mixed coverage report correctly', function (): void {
-        $parser = new CoverageParser();
-        $report = $parser->parse(__DIR__ . '/../Fixtures/coverage-mixed.xml');
+        $parser = new CoverageParser;
+        $report = $parser->parse(__DIR__.'/../Fixtures/coverage-mixed.xml');
 
         expect($report->totalClasses())->toBe(3)
             ->and($report->totalFullyCovered())->toBe(1)
@@ -30,15 +30,15 @@ describe('CoverageParser', function (): void {
     });
 
     it('excludes vendor files by default', function (): void {
-        $parser = new CoverageParser();
-        $report = $parser->parse(__DIR__ . '/../Fixtures/coverage-mixed.xml');
+        $parser = new CoverageParser;
+        $report = $parser->parse(__DIR__.'/../Fixtures/coverage-mixed.xml');
 
         expect($report->classes)->not->toHaveKey('Some\\Package\\Helper');
     });
 
     it('parses all-covered report', function (): void {
-        $parser = new CoverageParser();
-        $report = $parser->parse(__DIR__ . '/../Fixtures/coverage-all-covered.xml');
+        $parser = new CoverageParser;
+        $report = $parser->parse(__DIR__.'/../Fixtures/coverage-all-covered.xml');
 
         expect($report->totalClasses())->toBe(2)
             ->and($report->totalFullyCovered())->toBe(2)
@@ -47,8 +47,8 @@ describe('CoverageParser', function (): void {
     });
 
     it('parses all-uncovered report', function (): void {
-        $parser = new CoverageParser();
-        $report = $parser->parse(__DIR__ . '/../Fixtures/coverage-all-uncovered.xml');
+        $parser = new CoverageParser;
+        $report = $parser->parse(__DIR__.'/../Fixtures/coverage-all-uncovered.xml');
 
         expect($report->totalClasses())->toBe(2)
             ->and($report->totalFullyCovered())->toBe(0)
@@ -56,21 +56,21 @@ describe('CoverageParser', function (): void {
     });
 
     it('handles empty coverage report', function (): void {
-        $parser = new CoverageParser();
-        $report = $parser->parse(__DIR__ . '/../Fixtures/coverage-empty.xml');
+        $parser = new CoverageParser;
+        $report = $parser->parse(__DIR__.'/../Fixtures/coverage-empty.xml');
 
         expect($report->totalClasses())->toBe(0);
     });
 
     it('throws on non-existent file', function (): void {
-        $parser = new CoverageParser();
+        $parser = new CoverageParser;
         $parser->parse('/non/existent/file.xml');
     })->throws(InvalidArgumentException::class, 'Coverage file not found');
 
     it('supports custom include prefixes', function (): void {
-        $parser = new CoverageParser();
+        $parser = new CoverageParser;
         $report = $parser->parse(
-            __DIR__ . '/../Fixtures/coverage-mixed.xml',
+            __DIR__.'/../Fixtures/coverage-mixed.xml',
             ['vendor/'],
         );
 
@@ -79,9 +79,9 @@ describe('CoverageParser', function (): void {
     });
 
     it('handles windows-style paths', function (): void {
-        $parser = new CoverageParser();
+        $parser = new CoverageParser;
         $report = $parser->parse(
-            __DIR__ . '/../Fixtures/coverage-windows-paths.xml',
+            __DIR__.'/../Fixtures/coverage-windows-paths.xml',
         );
 
         expect($report->totalClasses())->toBe(1)

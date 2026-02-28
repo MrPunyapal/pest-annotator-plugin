@@ -9,17 +9,13 @@ use PestCoverageAnnotator\Data\CoverageReport;
 use PestCoverageAnnotator\Parsers\CoverageParser;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class Annotator
+final readonly class Annotator
 {
     public function __construct(
-        private readonly CoverageParser $parser = new CoverageParser(),
+        private CoverageParser $parser = new CoverageParser,
     ) {}
 
-    /**
-     * Parses the coverage XML and writes the annotated report to the output.
-     *
-     * @param array<int, string> $includePrefixes
-     */
+    /** @param array<int, string> $includePrefixes */
     public function annotate(
         string $coveragePath,
         OutputInterface $output,
@@ -93,7 +89,7 @@ final class Annotator
         $output->writeln('');
 
         foreach ($covered as $class) {
-            $output->writeln("  📄 <fg=green>Class: {$class->className}</>");
+            $output->writeln(sprintf('  📄 <fg=green>Class: %s</>', $class->className));
             $output->writeln('     ✅ <fg=green>Fully Covered</>');
             $output->writeln('');
         }
@@ -104,21 +100,21 @@ final class Annotator
         $percentage = $class->coveragePercentage();
         $color = $this->percentageColor($percentage);
 
-        $output->writeln("  📄 <fg=white;options=bold>Class: {$class->className}</>");
-        $output->writeln("     Coverage: <fg={$color}>{$percentage}%</>");
+        $output->writeln(sprintf('  📄 <fg=white;options=bold>Class: %s</>', $class->className));
+        $output->writeln(sprintf('     Coverage: <fg=%s>%s%%</>', $color, $percentage));
 
         $uncoveredMethods = $class->uncoveredMethods();
 
         if ($uncoveredMethods !== []) {
-            $methodList = implode('(), ', $uncoveredMethods) . '()';
-            $output->writeln("     ❌ <fg=red>Uncovered: {$methodList}</>");
+            $methodList = implode('(), ', $uncoveredMethods).'()';
+            $output->writeln(sprintf('     ❌ <fg=red>Uncovered: %s</>', $methodList));
         }
 
         $coveredMethods = $class->coveredMethods();
 
         if ($coveredMethods !== []) {
-            $methodList = implode('(), ', $coveredMethods) . '()';
-            $output->writeln("     ✅ <fg=green>Covered: {$methodList}</>");
+            $methodList = implode('(), ', $coveredMethods).'()';
+            $output->writeln(sprintf('     ✅ <fg=green>Covered: %s</>', $methodList));
         }
 
         $output->writeln('');
@@ -128,10 +124,10 @@ final class Annotator
     {
         $output->writeln('<fg=white;options=bold>━━━ Summary ━━━</>');
         $output->writeln('');
-        $output->writeln("  Total Classes:      <fg=white>{$report->totalClasses()}</>");
-        $output->writeln("  Fully Covered:      <fg=green>{$report->totalFullyCovered()}</>");
-        $output->writeln("  Partially Covered:  <fg=yellow>{$report->totalPartiallyCovered()}</>");
-        $output->writeln("  Fully Uncovered:    <fg=red>{$report->totalUncovered()}</>");
+        $output->writeln(sprintf('  Total Classes:      <fg=white>%d</>', $report->totalClasses()));
+        $output->writeln(sprintf('  Fully Covered:      <fg=green>%d</>', $report->totalFullyCovered()));
+        $output->writeln(sprintf('  Partially Covered:  <fg=yellow>%d</>', $report->totalPartiallyCovered()));
+        $output->writeln(sprintf('  Fully Uncovered:    <fg=red>%d</>', $report->totalUncovered()));
         $output->writeln('');
     }
 

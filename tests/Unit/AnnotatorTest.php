@@ -7,11 +7,11 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 describe('Annotator', function (): void {
     it('outputs uncovered methods for mixed coverage', function (): void {
-        $annotator = new Annotator();
-        $output = new BufferedOutput();
+        $annotator = new Annotator;
+        $output = new BufferedOutput;
 
         $report = $annotator->annotate(
-            __DIR__ . '/../Fixtures/coverage-mixed.xml',
+            __DIR__.'/../Fixtures/coverage-mixed.xml',
             $output,
         );
 
@@ -29,11 +29,11 @@ describe('Annotator', function (): void {
     });
 
     it('shows fully covered classes when option enabled', function (): void {
-        $annotator = new Annotator();
-        $output = new BufferedOutput();
+        $annotator = new Annotator;
+        $output = new BufferedOutput;
 
         $annotator->annotate(
-            __DIR__ . '/../Fixtures/coverage-mixed.xml',
+            __DIR__.'/../Fixtures/coverage-mixed.xml',
             $output,
             showCovered: true,
         );
@@ -46,11 +46,11 @@ describe('Annotator', function (): void {
     });
 
     it('does not show fully covered section by default', function (): void {
-        $annotator = new Annotator();
-        $output = new BufferedOutput();
+        $annotator = new Annotator;
+        $output = new BufferedOutput;
 
         $annotator->annotate(
-            __DIR__ . '/../Fixtures/coverage-all-covered.xml',
+            __DIR__.'/../Fixtures/coverage-all-covered.xml',
             $output,
         );
 
@@ -61,11 +61,11 @@ describe('Annotator', function (): void {
     });
 
     it('shows message for empty coverage', function (): void {
-        $annotator = new Annotator();
-        $output = new BufferedOutput();
+        $annotator = new Annotator;
+        $output = new BufferedOutput;
 
         $annotator->annotate(
-            __DIR__ . '/../Fixtures/coverage-empty.xml',
+            __DIR__.'/../Fixtures/coverage-empty.xml',
             $output,
         );
 
@@ -75,11 +75,11 @@ describe('Annotator', function (): void {
     });
 
     it('returns correct report data', function (): void {
-        $annotator = new Annotator();
-        $output = new BufferedOutput();
+        $annotator = new Annotator;
+        $output = new BufferedOutput;
 
         $report = $annotator->annotate(
-            __DIR__ . '/../Fixtures/coverage-mixed.xml',
+            __DIR__.'/../Fixtures/coverage-mixed.xml',
             $output,
         );
 
