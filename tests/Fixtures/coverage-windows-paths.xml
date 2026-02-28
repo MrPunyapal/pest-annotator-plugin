@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1709164800">
+  <project timestamp="1709164800">
+    <file name="C:\projects\app\Services\WindowsService.php">
+      <class name="WindowsService" namespace="App\Services">
+        <metrics methods="1" coveredmethods="0" statements="5" coveredstatements="0"/>
+      </class>
+      <line num="10" type="method" name="execute" count="0"/>
+    </file>
+  </project>
+</coverage>

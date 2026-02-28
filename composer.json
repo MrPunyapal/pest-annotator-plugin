@@ -1,0 +1,54 @@
+{
+    "name": "mrpunyapal/pest-coverage-annotator",
+    "description": "A CLI tool that parses Clover coverage XML reports and annotates uncovered classes and methods with a clean, colorized output.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "pest",
+        "coverage",
+        "annotator",
+        "testing",
+        "php",
+        "clover",
+        "cli"
+    ],
+    "authors": [
+        {
+            "name": "Mr Punyapal",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "symfony/console": "^7.0",
+        "ext-dom": "*",
+        "ext-libxml": "*"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PestCoverageAnnotator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PestCoverageAnnotator\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/annotate"
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "pest"
+    }
+}

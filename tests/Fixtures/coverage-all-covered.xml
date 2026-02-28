@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1709164800">
+  <project timestamp="1709164800">
+    <file name="/var/www/app/Models/User.php">
+      <class name="User" namespace="App\Models">
+        <metrics methods="2" coveredmethods="2" statements="10" coveredstatements="10"/>
+      </class>
+      <line num="10" type="method" name="getFullName" count="8"/>
+      <line num="20" type="method" name="isAdmin" count="4"/>
+    </file>
+    <file name="/var/www/app/Models/Post.php">
+      <class name="Post" namespace="App\Models">
+        <metrics methods="1" coveredmethods="1" statements="5" coveredstatements="5"/>
+      </class>
+      <line num="10" type="method" name="getTitle" count="2"/>
+    </file>
+  </project>
+</coverage>
