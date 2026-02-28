@@ -34,17 +34,20 @@ final class CoverageAnalyzer
     private function extractClasses(File $file, array &$classes): void
     {
         foreach ($file->classes() as $className => $classData) {
-            $fqcn = $this->resolveClassName((string) $className, $classData['namespace']);
-            $methods = $this->extractMethods($classData['methods']);
+            $namespace = is_array($classData) ? $classData['namespace'] : $classData->namespace;
+            $methods = is_array($classData) ? $classData['methods'] : $classData->methods;
 
-            if ($methods === []) {
+            $fqcn = $this->resolveClassName((string) $className, $namespace);
+            $extractedMethods = $this->extractMethods($methods);
+
+            if ($extractedMethods === []) {
                 continue;
             }
 
             $classes[$fqcn] = new ClassCoverage(
                 className: $fqcn,
                 filePath: $file->pathAsString(),
-                methods: $methods,
+                methods: $extractedMethods,
             );
         }
     }
@@ -53,17 +56,20 @@ final class CoverageAnalyzer
     private function extractTraits(File $file, array &$classes): void
     {
         foreach ($file->traits() as $traitName => $traitData) {
-            $fqcn = $this->resolveClassName((string) $traitName, $traitData['namespace']);
-            $methods = $this->extractMethods($traitData['methods']);
+            $namespace = is_array($traitData) ? $traitData['namespace'] : $traitData->namespace;
+            $methods = is_array($traitData) ? $traitData['methods'] : $traitData->methods;
 
-            if ($methods === []) {
+            $fqcn = $this->resolveClassName((string) $traitName, $namespace);
+            $extractedMethods = $this->extractMethods($methods);
+
+            if ($extractedMethods === []) {
                 continue;
             }
 
             $classes[$fqcn] = new ClassCoverage(
                 className: $fqcn,
                 filePath: $file->pathAsString(),
-                methods: $methods,
+                methods: $extractedMethods,
             );
         }
     }
@@ -82,7 +88,7 @@ final class CoverageAnalyzer
     }
 
     /**
-     * @param  array<string, array{executableLines: int, executedLines: int, methodName: string, coverage: int|float, visibility: string, signature: string, startLine: int, endLine: int, executableBranches: int, executedBranches: int, executablePaths: int, executedPaths: int, ccn: int, crap: int|string, link: string}>  $methods
+     * @param  array<string, array{executableLines: int, executedLines: int}|object{executableLines: int, executedLines: int}>  $methods
      * @return array<string, bool>
      */
     private function extractMethods(array $methods): array
@@ -90,11 +96,14 @@ final class CoverageAnalyzer
         $result = [];
 
         foreach ($methods as $methodName => $methodData) {
-            if ($methodData['executableLines'] === 0) {
+            $executableLines = is_array($methodData) ? $methodData['executableLines'] : $methodData->executableLines;
+
+            if ($executableLines === 0) {
                 continue;
             }
 
-            $result[$methodName] = $methodData['executedLines'] > 0;
+            $executedLines = is_array($methodData) ? $methodData['executedLines'] : $methodData->executedLines;
+            $result[$methodName] = $executedLines > 0;
         }
 
         return $result;
