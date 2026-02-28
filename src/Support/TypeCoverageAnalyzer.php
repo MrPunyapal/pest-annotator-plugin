@@ -66,7 +66,7 @@ final class TypeCoverageAnalyzer
         return new TypeCoverageReport($classes);
     }
 
-    private function extractClassName(string $filePath, string $code): ?string
+    private function extractClassName(string $filePath, string $code): string
     {
         if (preg_match('/namespace\s+([\w\\\\]+)\s*;/', $code, $nsMatch)
             && preg_match('/(?:class|trait|interface|enum)\s+(\w+)/', $code, $classMatch)) {

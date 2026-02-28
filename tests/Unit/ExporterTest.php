@@ -5,9 +5,9 @@ declare(strict_types=1);
 use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
 use PestAnnotator\Data\MethodCoverage;
+use PestAnnotator\Renderers\HtmlExporter;
 use PestAnnotator\Renderers\JsonExporter;
 use PestAnnotator\Renderers\MarkdownExporter;
-use PestAnnotator\Renderers\HtmlExporter;
 
 beforeEach(function (): void {
     $this->report = new CoverageReport([
@@ -38,6 +38,7 @@ afterEach(function (): void {
             unlink($file);
         }
     }
+
     rmdir($this->tempDir);
 });
 

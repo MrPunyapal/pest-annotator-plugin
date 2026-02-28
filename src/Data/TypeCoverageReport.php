@@ -7,7 +7,7 @@ namespace PestAnnotator\Data;
 final readonly class TypeCoverageReport
 {
     /**
-     * @param  array<string, ClassTypeCoverage>  $classes keyed by FQCN
+     * @param  array<string, ClassTypeCoverage>  $classes  keyed by FQCN
      */
     public function __construct(
         public array $classes,

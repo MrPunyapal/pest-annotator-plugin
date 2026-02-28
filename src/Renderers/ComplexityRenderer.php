@@ -50,10 +50,8 @@ final readonly class ComplexityRenderer
             $warning,
         ));
 
-        if ($highRisk !== []) {
-            foreach ($highRisk as $method) {
-                $this->renderMethodRow($method, $output);
-            }
+        foreach ($highRisk as $method) {
+            $this->renderMethodRow($method, $output);
         }
     }
 

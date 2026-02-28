@@ -7,7 +7,7 @@ namespace PestAnnotator\Data;
 final readonly class ComplexityReport
 {
     /**
-     * @param  array<string, ClassComplexity>  $classes keyed by FQCN
+     * @param  array<string, ClassComplexity>  $classes  keyed by FQCN
      */
     public function __construct(
         public array $classes,

@@ -8,6 +8,7 @@ use Pest\Contracts\Plugins\AddsOutput;
 use Pest\Contracts\Plugins\HandlesArguments;
 use Pest\Plugins\Concerns\HandleArguments;
 use Pest\Support\Coverage;
+use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
 use PestAnnotator\Renderers\ComplexityRenderer;
 use PestAnnotator\Renderers\CoverageRenderer;
@@ -25,14 +26,14 @@ use PestAnnotator\Support\TypeCoverageAnalyzer;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class Plugin implements AddsOutput, HandlesArguments
+final readonly class Plugin implements AddsOutput, HandlesArguments
 {
     use HandleArguments;
 
-    private readonly ArgumentParser $parser;
+    private ArgumentParser $parser;
 
     public function __construct(
-        private readonly OutputInterface $output,
+        private OutputInterface $output,
     ) {
         $this->parser = new ArgumentParser;
     }
@@ -88,7 +89,7 @@ final class Plugin implements AddsOutput, HandlesArguments
         }
 
         if ($this->parser->getNamespaceExclude() !== null) {
-            $report = $report->excludeNamespace($this->parser->getNamespaceExclude());
+            return $report->excludeNamespace($this->parser->getNamespaceExclude());
         }
 
         return $report;
@@ -110,7 +111,7 @@ final class Plugin implements AddsOutput, HandlesArguments
         }
 
         $filePaths = array_unique(array_map(
-            static fn ($class) => $class->filePath,
+            static fn (ClassCoverage $class): string => $class->filePath,
             $report->classes,
         ));
 
@@ -130,7 +131,7 @@ final class Plugin implements AddsOutput, HandlesArguments
         }
 
         $filePaths = array_unique(array_map(
-            static fn ($class) => $class->filePath,
+            static fn (ClassCoverage $class): string => $class->filePath,
             $report->classes,
         ));
 
@@ -195,7 +196,7 @@ final class Plugin implements AddsOutput, HandlesArguments
         };
 
         if (in_array($format, ['json', 'md', 'html'], true)) {
-            $this->output->writeln(sprintf('  <fg=green>Coverage report exported to %s</>', $outputPath ?? "coverage-annotator.$format"));
+            $this->output->writeln(sprintf('  <fg=green>Coverage report exported to %s</>', $outputPath ?? 'coverage-annotator.'.$format));
             $this->output->writeln('');
         }
     }

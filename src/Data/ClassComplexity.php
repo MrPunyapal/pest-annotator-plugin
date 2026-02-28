@@ -54,7 +54,7 @@ final readonly class ClassComplexity
 
     public function totalComplexity(): int
     {
-        return (int) array_sum(array_map(
+        return array_sum(array_map(
             static fn (MethodComplexity $m): int => $m->cyclomaticComplexity,
             $this->methods,
         ));

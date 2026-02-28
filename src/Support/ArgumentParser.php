@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PestAnnotator\Support;
 
+use Closure;
+
 final class ArgumentParser
 {
     private bool $coverageEnabled = false;
@@ -42,8 +44,8 @@ final class ArgumentParser
      */
     public function parse(array $arguments): array
     {
-        $arguments = $this->detectFlag('--coverage', $arguments, consumed: false, callback: fn () => $this->coverageEnabled = true);
-        $arguments = $this->detectFlag('--annotate', $arguments, consumed: true, callback: fn () => $this->annotateEnabled = true);
+        $arguments = $this->detectFlag('--coverage', $arguments, consumed: false, callback: fn (): true => $this->coverageEnabled = true);
+        $arguments = $this->detectFlag('--annotate', $arguments, consumed: true, callback: fn (): true => $this->annotateEnabled = true);
         $arguments = $this->detectFlag('--annotate-methods', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
             $this->showMethods = true;
@@ -170,7 +172,7 @@ final class ArgumentParser
      * @param  array<int, string>  $arguments
      * @return array<int, string>
      */
-    private function detectFlag(string $flag, array $arguments, bool $consumed, \Closure $callback): array
+    private function detectFlag(string $flag, array $arguments, bool $consumed, Closure $callback): array
     {
         if (! in_array($flag, $arguments, true)) {
             return $arguments;
@@ -179,7 +181,7 @@ final class ArgumentParser
         $callback();
 
         if ($consumed) {
-            $arguments = array_values(array_filter(
+            return array_values(array_filter(
                 $arguments,
                 static fn (string $arg): bool => $arg !== $flag,
             ));
@@ -194,7 +196,7 @@ final class ArgumentParser
      * @param  array<int, string>  $arguments
      * @return array<int, string>
      */
-    private function extractValueFlag(string $prefix, array $arguments, \Closure $callback): array
+    private function extractValueFlag(string $prefix, array $arguments, Closure $callback): array
     {
         $filtered = [];
 

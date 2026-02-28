@@ -6,6 +6,7 @@ namespace PestAnnotator\Visitors;
 
 use PestAnnotator\Data\MissingTypeInfo;
 use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Property;
@@ -76,7 +77,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
 
         $this->totalDeclarations++;
 
-        if ($method->returnType !== null) {
+        if ($method->returnType instanceof Node) {
             $this->typedDeclarations++;
         } else {
             $this->missingTypes[] = new MissingTypeInfo(
@@ -93,7 +94,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
             if ($param->type !== null) {
                 $this->typedDeclarations++;
             } else {
-                $paramName = $param->var instanceof Node\Expr\Variable ? (string) $param->var->name : 'unknown';
+                $paramName = $param->var instanceof Variable ? (string) $param->var->name : 'unknown';
                 $this->missingTypes[] = new MissingTypeInfo(
                     kind: 'param',
                     name: '$'.$paramName,
@@ -113,7 +114,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
                 if ($param->type !== null) {
                     $this->typedDeclarations++;
                 } else {
-                    $paramName = $param->var instanceof Node\Expr\Variable ? (string) $param->var->name : 'unknown';
+                    $paramName = $param->var instanceof Variable ? (string) $param->var->name : 'unknown';
                     $this->missingTypes[] = new MissingTypeInfo(
                         kind: 'property',
                         name: '$'.$paramName,
@@ -130,7 +131,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
             if ($param->type !== null) {
                 $this->typedDeclarations++;
             } else {
-                $paramName = $param->var instanceof Node\Expr\Variable ? (string) $param->var->name : 'unknown';
+                $paramName = $param->var instanceof Variable ? (string) $param->var->name : 'unknown';
                 $this->missingTypes[] = new MissingTypeInfo(
                     kind: 'param',
                     name: '$'.$paramName,
@@ -140,7 +141,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($method->returnType === null) {
+        if (! $method->returnType instanceof Node) {
             // constructors implicitly return void, so we don't count them
         }
     }
@@ -150,7 +151,7 @@ final class TypeCoverageVisitor extends NodeVisitorAbstract
         foreach ($property->props as $prop) {
             $this->totalDeclarations++;
 
-            if ($property->type !== null) {
+            if ($property->type instanceof Node) {
                 $this->typedDeclarations++;
             } else {
                 $this->missingTypes[] = new MissingTypeInfo(
