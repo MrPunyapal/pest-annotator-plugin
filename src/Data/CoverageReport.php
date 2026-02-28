@@ -57,4 +57,35 @@ final readonly class CoverageReport
     {
         return count($this->partiallyCoveredClasses());
     }
+
+    /** Filters to classes whose FQCN starts with the given namespace prefix. */
+    public function filterByNamespace(string $prefix): self
+    {
+        return new self(array_filter(
+            $this->classes,
+            static fn (ClassCoverage $c): bool => str_starts_with($c->className, $prefix),
+        ));
+    }
+
+    /** Excludes classes whose FQCN starts with the given namespace prefix. */
+    public function excludeNamespace(string $prefix): self
+    {
+        return new self(array_filter(
+            $this->classes,
+            static fn (ClassCoverage $c): bool => ! str_starts_with($c->className, $prefix),
+        ));
+    }
+
+    /**
+     * Returns classes that fall below the given coverage threshold.
+     *
+     * @return array<string, ClassCoverage>
+     */
+    public function classesBelowThreshold(float $threshold): array
+    {
+        return array_filter(
+            $this->classes,
+            static fn (ClassCoverage $c): bool => $c->coveragePercentage() < $threshold,
+        );
+    }
 }
