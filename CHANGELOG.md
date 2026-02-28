@@ -4,6 +4,7 @@ All notable changes to `pest-coverage-annotator` will be documented in this file
 
 ## Unreleased
 
+- Added Pest 4 support (`pestphp/pest-plugin: ^3.0 || ^4.0`)
 - Initial release
 - Clover XML coverage parsing with DOMDocument
 - Colorized CLI output for uncovered/partially covered/fully covered classes

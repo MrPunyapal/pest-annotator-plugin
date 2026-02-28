@@ -20,12 +20,12 @@
     ],
     "require": {
         "php": "^8.2",
-        "pestphp/pest-plugin": "^3.0"
+        "pestphp/pest-plugin": "^3.0 || ^4.0"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest": "^3.0 || ^4.0",
+        "pestphp/pest-plugin-arch": "^3.0 || ^4.0",
         "phpstan/phpstan": "^2.0",
         "rector/rector": "^2.0"
     },
