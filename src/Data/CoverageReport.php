@@ -11,9 +11,7 @@ final readonly class CoverageReport
         public array $classes,
     ) {}
 
-    /**
-     * @return array<string, ClassCoverage>
-     */
+    /** @return array<string, ClassCoverage> */
     public function fullyCoveredClasses(): array
     {
         return array_filter(
@@ -22,9 +20,7 @@ final readonly class CoverageReport
         );
     }
 
-    /**
-     * @return array<string, ClassCoverage>
-     */
+    /** @return array<string, ClassCoverage> */
     public function fullyUncoveredClasses(): array
     {
         return array_filter(
@@ -33,9 +29,7 @@ final readonly class CoverageReport
         );
     }
 
-    /**
-     * @return array<string, ClassCoverage>
-     */
+    /** @return array<string, ClassCoverage> */
     public function partiallyCoveredClasses(): array
     {
         return array_filter(

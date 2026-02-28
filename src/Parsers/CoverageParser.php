@@ -113,8 +113,6 @@ final class CoverageParser
             return;
         }
 
-        $this->extractCoveredLines($xpath, $fileNode);
-
         foreach ($classNodes as $classNode) {
             if (! $classNode instanceof DOMElement) {
                 continue;
@@ -144,27 +142,6 @@ final class CoverageParser
         }
     }
 
-    /** @return array<int, int> line number => hit count */
-    private function extractCoveredLines(DOMXPath $xpath, DOMElement $fileNode): array
-    {
-        $lineNodes = $xpath->query('line[@type="stmt" or @type="method"]', $fileNode);
-        $coveredLines = [];
-
-        if ($lineNodes instanceof DOMNodeList) {
-            foreach ($lineNodes as $lineNode) {
-                if (! $lineNode instanceof DOMElement) {
-                    continue;
-                }
-
-                $lineNum = (int) $lineNode->getAttribute('num');
-                $count = (int) $lineNode->getAttribute('count');
-                $coveredLines[$lineNum] = $count;
-            }
-        }
-
-        return $coveredLines;
-    }
-
     private function resolveClassName(DOMElement $classNode): string
     {
         $namespace = $classNode->getAttribute('namespace');
@@ -177,9 +154,7 @@ final class CoverageParser
         return $name;
     }
 
-    /**
-     * @return array<string, bool>
-     */
+    /** @return array<string, bool> */
     private function extractMethods(DOMXPath $xpath, DOMElement $fileNode): array
     {
         $methodNodes = $xpath->query('line[@type="method"]', $fileNode);
