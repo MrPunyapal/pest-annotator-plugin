@@ -64,8 +64,8 @@
             "pint --test --parallel"
         ],
         "test:types": "phpstan analyse",
-        "test:arch": "./vendor/bin/pest --filter=arch",
-        "test:unit": "./vendor/bin/pest --parallel",
+        "test:arch": "php vendor/bin/pest --filter=arch",
+        "test:unit": "php vendor/bin/pest --parallel",
         "test": [
             "@test:lint",
             "@test:types",
