@@ -11,7 +11,7 @@ A [Pest PHP](https://pestphp.com) plugin that automatically annotates uncovered 
 ## Installation
 
 ```bash
-composer require --dev mrpunyapal/pest-annotator
+composer require --dev mrpunyapal/pest-annotator-plugin
 ```
 
 ## Usage
@@ -59,8 +59,8 @@ After Pest's default per-file coverage table, the plugin appends class-level ann
 ## Development
 
 ```bash
-git clone https://github.com/mrpunyapal/pest-annotator.git
-cd pest-annotator
+git clone https://github.com/mrpunyapal/pest-annotator-plugin.git
+cd pest-annotator-plugin
 composer install
 composer test
 ```
