@@ -16,10 +16,24 @@ composer require --dev mrpunyapal/pest-annotator-plugin
 
 ## Usage
 
-Just run Pest with coverage enabled — the plugin activates automatically:
+Just run Pest with coverage and the `--annotate` flag:
 
 ```bash
-./vendor/bin/pest --coverage
+./vendor/bin/pest --coverage --annotate
+```
+
+### Flags
+
+| Flag                  | Description                                          |
+|-----------------------|------------------------------------------------------|
+| `--annotate`          | Show class-level coverage annotations                |
+| `--annotate-methods`  | Show per-method details with line numbers             |
+| `--annotate-covered`  | Include fully covered classes and covered methods     |
+
+Flags can be combined:
+
+```bash
+./vendor/bin/pest --coverage --annotate-methods --annotate-covered
 ```
 
 ### Example Output
@@ -27,20 +41,15 @@ Just run Pest with coverage enabled — the plugin activates automatically:
 After Pest's default per-file coverage table, the plugin appends class-level annotations:
 
 ```
-━━━ Fully Uncovered Classes ━━━
+  Fully Uncovered Classes
 
-  📄 Class: App\Services\InvoiceService
-     Coverage: 0%
-     ❌ Uncovered: cancel(), refund(), generateInvoice()
+  ░░░░░░░░░░   0.0% (0/3 methods, 0.0% lines) App\Services\InvoiceService
 
-━━━ Partially Covered Classes ━━━
+  Partially Covered Classes
 
-  📄 Class: App\Services\PaymentService
-     Coverage: 66.7%
-     ❌ Uncovered: refund()
-     ✅ Covered: charge(), validate()
+  ████████░░  80.0% (4/5 methods, 85.0% lines) App\Jobs\UpdateUserAvatar
 
-━━━ Summary ━━━
+  Summary
 
   Total Classes:      5
   Fully Covered:      3
@@ -48,13 +57,22 @@ After Pest's default per-file coverage table, the plugin appends class-level ann
   Fully Uncovered:    1
 ```
 
+With `--annotate-methods`:
+
+```
+  Partially Covered Classes
+
+  ████████░░  80.0% (4/5 methods, 85.0% lines) App\Jobs\UpdateUserAvatar
+     ✕ failed() L42-58 (0/8 lines)
+```
+
 ## How It Works
 
 1. Hooks into Pest's plugin lifecycle via `HandlesArguments` and `AddsOutput`
-2. Detects `--coverage` flag — no extra flags needed
-3. After tests complete, reads the native `CodeCoverage` object (before Pest's own coverage plugin processes it)
-4. Extracts class-level and method-level coverage data from `SebastianBergmann\CodeCoverage`
-5. Renders annotated output grouped by coverage status (uncovered → partial → summary)
+2. Activated by `--annotate` flag (requires `--coverage`)
+3. After tests complete, reads the native `CodeCoverage` object
+4. Extracts class-level and method-level coverage data including line numbers
+5. Renders annotated output with progress bars, method/line coverage stats, grouped by coverage status
 
 ## Development
 

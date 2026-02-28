@@ -5,16 +5,34 @@ declare(strict_types=1);
 use PestAnnotator\Plugin;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-it('detects --coverage flag in arguments', function (): void {
+it('detects --coverage and --annotate flags in arguments', function (): void {
     $output = new BufferedOutput;
     $plugin = new Plugin($output);
 
-    $result = $plugin->handleArguments(['--coverage', '--filter=unit']);
+    $result = $plugin->handleArguments(['--coverage', '--annotate', '--filter=unit']);
 
     expect($result)->toBe(['--coverage', '--filter=unit']);
 });
 
-it('passes through arguments unchanged', function (): void {
+it('detects --annotate-methods flag', function (): void {
+    $output = new BufferedOutput;
+    $plugin = new Plugin($output);
+
+    $result = $plugin->handleArguments(['--coverage', '--annotate-methods']);
+
+    expect($result)->toBe(['--coverage']);
+});
+
+it('detects --annotate-covered flag', function (): void {
+    $output = new BufferedOutput;
+    $plugin = new Plugin($output);
+
+    $result = $plugin->handleArguments(['--coverage', '--annotate-covered']);
+
+    expect($result)->toBe(['--coverage']);
+});
+
+it('passes through arguments unchanged without annotate flags', function (): void {
     $output = new BufferedOutput;
     $plugin = new Plugin($output);
 
@@ -24,21 +42,29 @@ it('passes through arguments unchanged', function (): void {
     expect($result)->toBe($args);
 });
 
+it('returns exit code unchanged when annotate is not enabled', function (): void {
+    $output = new BufferedOutput;
+    $plugin = new Plugin($output);
+
+    $plugin->handleArguments(['--coverage']);
+
+    expect($plugin->addOutput(0))->toBe(0);
+});
+
 it('returns exit code unchanged when coverage is not enabled', function (): void {
     $output = new BufferedOutput;
     $plugin = new Plugin($output);
 
-    $plugin->handleArguments(['--filter=unit']);
+    $plugin->handleArguments(['--annotate']);
 
-    expect($plugin->addOutput(0))->toBe(0)
-        ->and($plugin->addOutput(1))->toBe(1);
+    expect($plugin->addOutput(0))->toBe(0);
 });
 
 it('returns exit code unchanged when tests failed', function (): void {
     $output = new BufferedOutput;
     $plugin = new Plugin($output);
 
-    $plugin->handleArguments(['--coverage']);
+    $plugin->handleArguments(['--coverage', '--annotate']);
 
     expect($plugin->addOutput(1))->toBe(1);
 });

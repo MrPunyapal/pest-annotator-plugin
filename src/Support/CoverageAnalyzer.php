@@ -6,6 +6,7 @@ namespace PestAnnotator\Support;
 
 use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
+use PestAnnotator\Data\MethodCoverage;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Node\File;
 
@@ -82,8 +83,10 @@ final class CoverageAnalyzer
     }
 
     /**
-     * @param  array<string, object{executableLines: int, executedLines: int}>  $methods
-     * @return array<string, bool>
+     * Extracts method coverage data from processed method types.
+     *
+     * @param  array<string, object{executableLines: int, executedLines: int, startLine: int, endLine: int, visibility: string}>  $methods
+     * @return array<string, MethodCoverage>
      */
     private function extractMethods(array $methods): array
     {
@@ -94,7 +97,14 @@ final class CoverageAnalyzer
                 continue;
             }
 
-            $result[$methodName] = $methodData->executedLines > 0;
+            $result[$methodName] = new MethodCoverage(
+                name: $methodName,
+                startLine: $methodData->startLine,
+                endLine: $methodData->endLine,
+                executableLines: $methodData->executableLines,
+                executedLines: $methodData->executedLines,
+                visibility: $methodData->visibility,
+            );
         }
 
         return $result;

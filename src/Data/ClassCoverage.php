@@ -6,7 +6,7 @@ namespace PestAnnotator\Data;
 
 final readonly class ClassCoverage
 {
-    /** @param array<string, bool> $methods method name => covered flag */
+    /** @param array<string, MethodCoverage> $methods method name => coverage data */
     public function __construct(
         public string $className,
         public string $filePath,
@@ -19,7 +19,13 @@ final readonly class ClassCoverage
             return true;
         }
 
-        return ! in_array(false, $this->methods, true);
+        foreach ($this->methods as $method) {
+            if (! $method->isCovered()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function isFullyUncovered(): bool
@@ -28,24 +34,30 @@ final readonly class ClassCoverage
             return false;
         }
 
-        return ! in_array(true, $this->methods, true);
+        foreach ($this->methods as $method) {
+            if ($method->isCovered()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    /** @return array<int, string> */
+    /** @return array<int, MethodCoverage> */
     public function uncoveredMethods(): array
     {
-        return array_keys(array_filter(
+        return array_values(array_filter(
             $this->methods,
-            static fn (bool $covered): bool => ! $covered,
+            static fn (MethodCoverage $m): bool => ! $m->isCovered(),
         ));
     }
 
-    /** @return array<int, string> */
+    /** @return array<int, MethodCoverage> */
     public function coveredMethods(): array
     {
-        return array_keys(array_filter(
+        return array_values(array_filter(
             $this->methods,
-            static fn (bool $covered): bool => $covered,
+            static fn (MethodCoverage $m): bool => $m->isCovered(),
         ));
     }
 
@@ -59,5 +71,22 @@ final readonly class ClassCoverage
         $total = count($this->methods);
 
         return round(($covered / $total) * 100, 1);
+    }
+
+    public function lineCoveragePercentage(): float
+    {
+        $totalExecutable = 0;
+        $totalExecuted = 0;
+
+        foreach ($this->methods as $method) {
+            $totalExecutable += $method->executableLines;
+            $totalExecuted += $method->executedLines;
+        }
+
+        if ($totalExecutable === 0) {
+            return 100.0;
+        }
+
+        return round(($totalExecuted / $totalExecutable) * 100, 1);
     }
 }

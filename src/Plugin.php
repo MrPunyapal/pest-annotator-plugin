@@ -19,6 +19,12 @@ final class Plugin implements AddsOutput, HandlesArguments
 
     private bool $coverageEnabled = false;
 
+    private bool $annotateEnabled = false;
+
+    private bool $showMethods = false;
+
+    private bool $showCovered = false;
+
     public function __construct(
         private readonly OutputInterface $output,
     ) {}
@@ -30,12 +36,29 @@ final class Plugin implements AddsOutput, HandlesArguments
             $this->coverageEnabled = true;
         }
 
+        if ($this->hasArgument('--annotate', $arguments)) {
+            $this->annotateEnabled = true;
+            $arguments = $this->popArgument('--annotate', $arguments);
+        }
+
+        if ($this->hasArgument('--annotate-methods', $arguments)) {
+            $this->annotateEnabled = true;
+            $this->showMethods = true;
+            $arguments = $this->popArgument('--annotate-methods', $arguments);
+        }
+
+        if ($this->hasArgument('--annotate-covered', $arguments)) {
+            $this->annotateEnabled = true;
+            $this->showCovered = true;
+            $arguments = $this->popArgument('--annotate-covered', $arguments);
+        }
+
         return $arguments;
     }
 
     public function addOutput(int $exitCode): int
     {
-        if (! $this->coverageEnabled || $exitCode !== 0) {
+        if (! $this->coverageEnabled || ! $this->annotateEnabled || $exitCode !== 0) {
             return $exitCode;
         }
 
@@ -59,7 +82,10 @@ final class Plugin implements AddsOutput, HandlesArguments
             return $exitCode;
         }
 
-        $renderer = new CoverageRenderer;
+        $renderer = new CoverageRenderer(
+            showMethods: $this->showMethods,
+            showCovered: $this->showCovered,
+        );
         $renderer->render($report, $this->output);
 
         return $exitCode;
