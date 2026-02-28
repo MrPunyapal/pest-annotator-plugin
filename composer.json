@@ -1,5 +1,5 @@
 {
-    "name": "mrpunyapal/pest-annotator",
+    "name": "mrpunyapal/pest-annotator-plugin",
     "description": "A Pest plugin that annotates uncovered classes and methods with clean, colorized output when running pest --coverage.",
     "type": "library",
     "license": "MIT",
@@ -8,11 +8,13 @@
         "coverage",
         "annotator",
         "testing",
-        "php"
+        "php",
+        "plugin"
     ],
     "authors": [
         {
-            "name": "Mr Punyapal",
+            "name": "Punyapal Shah",
+            "email": "mrpunyapal@gmail.com",
             "role": "Developer"
         }
     ],
@@ -57,12 +59,10 @@
             "rector",
             "pint --parallel"
         ],
-        "refactor": "rector",
         "test:lint": [
             "rector --dry-run",
             "pint --test --parallel"
         ],
-        "test:refactor": "rector --dry-run",
         "test:types": "phpstan analyse",
         "test:arch": "pest --filter=arch",
         "test:unit": "pest --parallel",
