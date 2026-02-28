@@ -20,6 +20,10 @@ arch('support classes are final')
     ->expect('PestAnnotator\Support')
     ->toBeFinal();
 
+arch('visitors are final')
+    ->expect('PestAnnotator\Visitors')
+    ->toBeFinal();
+
 arch('plugin is final')
     ->expect(Plugin::class)
     ->toBeFinal();
