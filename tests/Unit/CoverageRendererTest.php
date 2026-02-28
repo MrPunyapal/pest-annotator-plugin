@@ -44,6 +44,7 @@ it('renders uncovered and partially covered classes', function (): void {
 
     $renderer = new CoverageRenderer;
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->toContain('Fully Uncovered Classes')
@@ -77,6 +78,7 @@ it('renders summary with correct counts', function (): void {
 
     $renderer = new CoverageRenderer;
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->toContain('Total Classes:')
@@ -98,6 +100,7 @@ it('skips uncovered section when all classes are covered', function (): void {
 
     $renderer = new CoverageRenderer;
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->not->toContain('Fully Uncovered Classes')
@@ -120,6 +123,7 @@ it('shows progress bar and line coverage', function (): void {
 
     $renderer = new CoverageRenderer;
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->toContain('66.7%')
@@ -141,6 +145,7 @@ it('shows method details with line numbers when showMethods enabled', function (
 
     $renderer = new CoverageRenderer(showMethods: true);
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->toContain('refund()')
@@ -162,6 +167,7 @@ it('shows covered methods when showCovered enabled', function (): void {
 
     $renderer = new CoverageRenderer(showCovered: true);
     $renderer->render($report, $this->output);
+
     $text = $this->output->fetch();
 
     expect($text)->toContain('Fully Covered Classes')

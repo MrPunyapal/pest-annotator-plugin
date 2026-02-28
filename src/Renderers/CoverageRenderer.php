@@ -6,14 +6,13 @@ namespace PestAnnotator\Renderers;
 
 use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
-use PestAnnotator\Data\MethodCoverage;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class CoverageRenderer
+final readonly class CoverageRenderer
 {
     public function __construct(
-        private readonly bool $showMethods = false,
-        private readonly bool $showCovered = false,
+        private bool $showMethods = false,
+        private bool $showCovered = false,
     ) {}
 
     public function render(CoverageReport $report, OutputInterface $output): void

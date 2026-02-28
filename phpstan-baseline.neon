@@ -1,3 +1,8 @@
-# Generated baseline
+# Generated baseline — property access on ProcessedClassType/ProcessedTraitType
+# works at runtime with PHPUnit 12 (Pest 4) where these are objects, not arrays.
 parameters:
-    ignoreErrors: []
+    ignoreErrors:
+        - message: '#Cannot access property \$namespace on#'
+          path: src/Support/CoverageAnalyzer.php
+        - message: '#Cannot access property \$methods on#'
+          path: src/Support/CoverageAnalyzer.php
