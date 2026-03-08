@@ -2,7 +2,7 @@
 /build/
 /.phpunit.cache/
 /.php-cs-fixer.cache
-/composer.lock
+composer.lock
 *.swp
 *.swo
 .DS_Store
