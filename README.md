@@ -25,7 +25,7 @@ Run Pest with coverage and any of the `--annotate-*` flags:
 Flags can be freely combined:
 
 ```bash
-./vendor/bin/pest --coverage --annotate-methods --annotate-types --annotate-complexity
+./vendor/bin/pest --coverage --annotate-methods --annotate-complexity
 ```
 
 ---
@@ -39,12 +39,6 @@ Flags can be freely combined:
 | `--annotate`          | Show class-level coverage annotations                         |
 | `--annotate-methods`  | Show per-method details with line numbers                     |
 | `--annotate-covered`  | Also include fully covered classes and methods in output      |
-
-### Type Coverage
-
-| Flag                  | Description                                                   |
-|-----------------------|---------------------------------------------------------------|
-| `--annotate-types`    | Analyse PHP files for missing return, parameter, and property types |
 
 ### Complexity Analysis
 
@@ -116,8 +110,10 @@ Flags can be freely combined:
 
 ### Type coverage analysis
 
+When using Pest's [type-coverage plugin](https://pestphp.com/docs/type-coverage), combine `--type-coverage` with `--annotate` to get annotated type coverage output:
+
 ```bash
-./vendor/bin/pest --coverage --annotate-types
+./vendor/bin/pest --type-coverage --annotate
 ```
 
 ```
@@ -128,6 +124,8 @@ Flags can be freely combined:
      missing return type: handle()
      missing param type:  handle() $request
 ```
+
+> **Note:** `--coverage` and `--type-coverage` are independent features and should not be used together.
 
 ### Complexity analysis
 

@@ -10,6 +10,8 @@ final class ArgumentParser
 {
     private bool $coverageEnabled = false;
 
+    private bool $typeCoverageEnabled = false;
+
     private bool $annotateEnabled = false;
 
     private bool $showMethods = false;
@@ -45,6 +47,13 @@ final class ArgumentParser
     public function parse(array $arguments): array
     {
         $arguments = $this->detectFlag('--coverage', $arguments, consumed: false, callback: fn (): true => $this->coverageEnabled = true);
+        $arguments = $this->detectFlag('--type-coverage', $arguments, consumed: false, callback: fn (): true => $this->typeCoverageEnabled = true);
+
+        // Pest's type-coverage plugin may consume --type-coverage before us,
+        // so also check the original argv as a fallback.
+        if (! $this->typeCoverageEnabled && in_array('--type-coverage', $_SERVER['argv'] ?? [], true)) {
+            $this->typeCoverageEnabled = true;
+        }
         $arguments = $this->detectFlag('--annotate', $arguments, consumed: true, callback: fn (): true => $this->annotateEnabled = true);
         $arguments = $this->detectFlag('--annotate-methods', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
@@ -53,10 +62,6 @@ final class ArgumentParser
         $arguments = $this->detectFlag('--annotate-covered', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
             $this->showCovered = true;
-        });
-        $arguments = $this->detectFlag('--annotate-types', $arguments, consumed: true, callback: function (): void {
-            $this->annotateEnabled = true;
-            $this->showTypes = true;
         });
         $arguments = $this->detectFlag('--annotate-complexity', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
@@ -95,12 +100,21 @@ final class ArgumentParser
             $this->exportOutput = $value;
         });
 
+        if ($this->typeCoverageEnabled && $this->annotateEnabled) {
+            $this->showTypes = true;
+        }
+
         return array_values($arguments);
     }
 
     public function isCoverageEnabled(): bool
     {
         return $this->coverageEnabled;
+    }
+
+    public function isTypeCoverageEnabled(): bool
+    {
+        return $this->typeCoverageEnabled;
     }
 
     public function isAnnotateEnabled(): bool

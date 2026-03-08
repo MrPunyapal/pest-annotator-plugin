@@ -8,7 +8,6 @@ use Pest\Contracts\Plugins\AddsOutput;
 use Pest\Contracts\Plugins\HandlesArguments;
 use Pest\Plugins\Concerns\HandleArguments;
 use Pest\Support\Coverage;
-use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
 use PestAnnotator\Renderers\ComplexityRenderer;
 use PestAnnotator\Renderers\CoverageRenderer;
@@ -46,7 +45,17 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
 
     public function addOutput(int $exitCode): int
     {
-        if (! $this->parser->isCoverageEnabled() || ! $this->parser->isAnnotateEnabled() || $exitCode !== 0) {
+        // TODO: Remove debug line after testing
+        $this->output->writeln(sprintf(
+            '  <fg=magenta>[DEBUG] exitCode=%d annotate=%s coverage=%s typeCoverage=%s showTypes=%s</>',
+            $exitCode,
+            $this->parser->isAnnotateEnabled() ? 'Y' : 'N',
+            $this->parser->isCoverageEnabled() ? 'Y' : 'N',
+            $this->parser->isTypeCoverageEnabled() ? 'Y' : 'N',
+            $this->parser->shouldShowTypes() ? 'Y' : 'N',
+        ));
+
+        if (! $this->parser->isAnnotateEnabled()) {
             return $exitCode;
         }
 
@@ -54,6 +63,19 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
             return $exitCode;
         }
 
+        if ($this->parser->isCoverageEnabled() && $exitCode === 0) {
+            return $this->handleCoverageOutput($exitCode);
+        }
+
+        if ($this->parser->isTypeCoverageEnabled()) {
+            $this->renderTypeCoverageStandalone();
+        }
+
+        return $exitCode;
+    }
+
+    private function handleCoverageOutput(int $exitCode): int
+    {
         $coveragePath = Coverage::getPath();
 
         if (! file_exists($coveragePath)) {
@@ -73,13 +95,17 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         }
 
         $this->renderCoverage($report);
-        $this->renderTypeCoverage($report);
         $this->renderComplexity($report);
         $this->handleBaseline($report);
         $this->renderDiff($report);
         $this->export($report);
 
         return $this->enforceThreshold($report, $exitCode);
+    }
+
+    private function renderTypeCoverageStandalone(): void
+    {
+        $this->renderTypeCoverageFromPaths($this->getSourceFilePaths());
     }
 
     private function applyFilters(CoverageReport $report): CoverageReport
@@ -104,16 +130,12 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         $renderer->render($report, $this->output);
     }
 
-    private function renderTypeCoverage(CoverageReport $report): void
+    /** @param array<int, string> $filePaths */
+    private function renderTypeCoverageFromPaths(array $filePaths): void
     {
-        if (! $this->parser->shouldShowTypes()) {
+        if (! $this->parser->shouldShowTypes() || $filePaths === []) {
             return;
         }
-
-        $filePaths = array_values(array_unique(array_map(
-            static fn (ClassCoverage $class): string => $class->filePath,
-            $report->classes,
-        )));
 
         $analyzer = new TypeCoverageAnalyzer;
         $typeReport = $analyzer->analyze($filePaths);
@@ -122,6 +144,51 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
             showMethods: $this->parser->shouldShowMethods(),
         );
         $renderer->render($typeReport, $this->output);
+    }
+
+    /** @return array<int, string> */
+    private function getSourceFilePaths(): array
+    {
+        $composerJsonPath = getcwd().'/composer.json';
+
+        if (! file_exists($composerJsonPath)) {
+            return [];
+        }
+
+        /** @var array{autoload?: array{psr-4?: array<string, string|array<int, string>>}} $composer */
+        $composer = json_decode((string) file_get_contents($composerJsonPath), true);
+
+        $directories = [];
+
+        foreach ($composer['autoload']['psr-4'] ?? [] as $paths) {
+            foreach ((array) $paths as $path) {
+                $fullPath = getcwd().'/'.$path;
+                if (is_dir($fullPath)) {
+                    $directories[] = $fullPath;
+                }
+            }
+        }
+
+        if ($directories === []) {
+            return [];
+        }
+
+        $filePaths = [];
+
+        foreach ($directories as $directory) {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            );
+
+            /** @var \SplFileInfo $file */
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    $filePaths[] = $file->getRealPath();
+                }
+            }
+        }
+
+        return $filePaths;
     }
 
     private function renderComplexity(CoverageReport $report): void

@@ -68,3 +68,21 @@ it('returns exit code unchanged when tests failed', function (): void {
 
     expect($plugin->addOutput(1))->toBe(1);
 });
+
+it('keeps --type-coverage in arguments and consumes --annotate', function (): void {
+    $output = new BufferedOutput;
+    $plugin = new Plugin($output);
+
+    $result = $plugin->handleArguments(['--type-coverage', '--annotate']);
+
+    expect($result)->toBe(['--type-coverage']);
+});
+
+it('returns exit code unchanged when only --type-coverage without --annotate', function (): void {
+    $output = new BufferedOutput;
+    $plugin = new Plugin($output);
+
+    $plugin->handleArguments(['--type-coverage']);
+
+    expect($plugin->addOutput(0))->toBe(0);
+});
