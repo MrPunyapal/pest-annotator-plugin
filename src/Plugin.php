@@ -40,21 +40,40 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
     /** @param array<int, string> $arguments */
     public function handleArguments(array $arguments): array
     {
-        return $this->parser->parse($arguments);
+        $arguments = $this->parser->parse($arguments);
+
+        // DEBUG: Write to file to verify flags
+        file_put_contents(
+            getcwd().'/pest-annotator-debug.log',
+            sprintf(
+                "handleArguments called\nannotate=%s typeCoverage=%s showTypes=%s\nargv=%s\n",
+                $this->parser->isAnnotateEnabled() ? 'Y' : 'N',
+                $this->parser->isTypeCoverageEnabled() ? 'Y' : 'N',
+                $this->parser->shouldShowTypes() ? 'Y' : 'N',
+                implode(' ', $_SERVER['argv'] ?? []),
+            ),
+        );
+
+        // Pest's type-coverage plugin calls exit() from handleOriginalArguments,
+        // so addOutput is never reached. Register a shutdown function now
+        // (during handleArguments, which runs before handleOriginalArguments)
+        // to ensure our annotations run before the process terminates.
+        if ($this->parser->isAnnotateEnabled() && $this->parser->isTypeCoverageEnabled()) {
+            register_shutdown_function(function (): void {
+                file_put_contents(
+                    getcwd().'/pest-annotator-debug.log',
+                    "shutdown function EXECUTED\ngetSourceFilePaths count=" . count($this->getSourceFilePaths()) . "\n",
+                    FILE_APPEND,
+                );
+                $this->renderTypeCoverageStandalone();
+            });
+        }
+
+        return $arguments;
     }
 
     public function addOutput(int $exitCode): int
     {
-        // TODO: Remove debug line after testing
-        $this->output->writeln(sprintf(
-            '  <fg=magenta>[DEBUG] exitCode=%d annotate=%s coverage=%s typeCoverage=%s showTypes=%s</>',
-            $exitCode,
-            $this->parser->isAnnotateEnabled() ? 'Y' : 'N',
-            $this->parser->isCoverageEnabled() ? 'Y' : 'N',
-            $this->parser->isTypeCoverageEnabled() ? 'Y' : 'N',
-            $this->parser->shouldShowTypes() ? 'Y' : 'N',
-        ));
-
         if (! $this->parser->isAnnotateEnabled()) {
             return $exitCode;
         }
@@ -65,10 +84,6 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
 
         if ($this->parser->isCoverageEnabled() && $exitCode === 0) {
             return $this->handleCoverageOutput($exitCode);
-        }
-
-        if ($this->parser->isTypeCoverageEnabled()) {
-            $this->renderTypeCoverageStandalone();
         }
 
         return $exitCode;
