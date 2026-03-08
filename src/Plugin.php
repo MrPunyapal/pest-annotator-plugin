@@ -35,41 +35,25 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         private OutputInterface $output,
     ) {
         $this->parser = new ArgumentParser;
+
+        // Pest's type-coverage plugin calls exit() from handleOriginalArguments
+        // (which runs BEFORE handleArguments), so addOutput is never reached.
+        // The constructor is the earliest hook since ALL plugins are instantiated
+        // before ANY plugin methods are called. We check $_SERVER['argv'] directly
+        // because the ArgumentParser hasn't parsed yet.
+        $argv = $_SERVER['argv'] ?? [];
+
+        if ($this->hasAnyAnnotateFlag($argv) && in_array('--type-coverage', $argv, true)) {
+            register_shutdown_function(function (): void {
+                $this->renderTypeCoverageStandalone();
+            });
+        }
     }
 
     /** @param array<int, string> $arguments */
     public function handleArguments(array $arguments): array
     {
-        $arguments = $this->parser->parse($arguments);
-
-        // DEBUG: Write to file to verify flags
-        file_put_contents(
-            getcwd().'/pest-annotator-debug.log',
-            sprintf(
-                "handleArguments called\nannotate=%s typeCoverage=%s showTypes=%s\nargv=%s\n",
-                $this->parser->isAnnotateEnabled() ? 'Y' : 'N',
-                $this->parser->isTypeCoverageEnabled() ? 'Y' : 'N',
-                $this->parser->shouldShowTypes() ? 'Y' : 'N',
-                implode(' ', $_SERVER['argv'] ?? []),
-            ),
-        );
-
-        // Pest's type-coverage plugin calls exit() from handleOriginalArguments,
-        // so addOutput is never reached. Register a shutdown function now
-        // (during handleArguments, which runs before handleOriginalArguments)
-        // to ensure our annotations run before the process terminates.
-        if ($this->parser->isAnnotateEnabled() && $this->parser->isTypeCoverageEnabled()) {
-            register_shutdown_function(function (): void {
-                file_put_contents(
-                    getcwd().'/pest-annotator-debug.log',
-                    "shutdown function EXECUTED\ngetSourceFilePaths count=" . count($this->getSourceFilePaths()) . "\n",
-                    FILE_APPEND,
-                );
-                $this->renderTypeCoverageStandalone();
-            });
-        }
-
-        return $arguments;
+        return $this->parser->parse($arguments);
     }
 
     public function addOutput(int $exitCode): int
@@ -121,6 +105,24 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
     private function renderTypeCoverageStandalone(): void
     {
         $this->renderTypeCoverageFromPaths($this->getSourceFilePaths());
+    }
+
+    /**
+     * Checks if any --annotate flag is present in the argument list.
+     *
+     * Used by handleOriginalArguments where the ArgumentParser hasn't parsed yet.
+     *
+     * @param array<int, string> $arguments
+     */
+    private function hasAnyAnnotateFlag(array $arguments): bool
+    {
+        foreach ($arguments as $argument) {
+            if (str_starts_with($argument, '--annotate')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function applyFilters(CoverageReport $report): CoverageReport
