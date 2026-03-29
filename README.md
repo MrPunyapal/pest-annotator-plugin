@@ -19,10 +19,10 @@ composer require --dev mrpunyapal/pest-annotator-plugin
 Run Pest with coverage and any of the `--annotate-*` flags:
 
 ```bash
-./vendor/bin/pest --coverage --annotate
+./vendor/bin/pest --annotate-coverage
 ```
 
-Flags can be freely combined:
+Or combine individual flags with the standard `--coverage` flag:
 
 ```bash
 ./vendor/bin/pest --coverage --annotate-methods --annotate-complexity
@@ -32,11 +32,18 @@ Flags can be freely combined:
 
 ## Flags Reference
 
+### All-in-one entry point
+
+| Flag                         | Description                                                         |
+|------------------------------|---------------------------------------------------------------------|
+| `--annotate-coverage`        | Enable coverage collection **and** class-level annotations in one flag. Replaces `--coverage --annotate`. |
+| `--annotate-coverage=N`      | Same as above, plus enforce a minimum coverage threshold of `N`%   |
+
 ### Coverage Annotations
 
 | Flag                  | Description                                                   |
 |-----------------------|---------------------------------------------------------------|
-| `--annotate`          | Show class-level coverage annotations                         |
+| `--annotate`          | Show class-level coverage annotations (requires `--coverage`) |
 | `--annotate-methods`  | Show per-method details with line numbers                     |
 | `--annotate-covered`  | Also include fully covered classes and methods in output      |
 
@@ -75,6 +82,10 @@ Flags can be freely combined:
 ### Basic coverage annotations
 
 ```bash
+# new single-flag form
+./vendor/bin/pest --annotate-coverage
+
+# classic form (still works)
 ./vendor/bin/pest --coverage --annotate
 ```
 
@@ -165,6 +176,10 @@ Save a baseline after a clean run, then compare on subsequent runs:
 ### Minimum coverage threshold
 
 ```bash
+# shorthand: enable coverage + annotations + threshold in one flag
+./vendor/bin/pest --annotate-coverage=80
+
+# explicit form (equivalent)
 ./vendor/bin/pest --coverage --annotate --annotate-min=80
 ```
 

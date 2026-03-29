@@ -8,6 +8,7 @@ use Pest\Contracts\Plugins\AddsOutput;
 use Pest\Contracts\Plugins\HandlesArguments;
 use Pest\Plugins\Concerns\HandleArguments;
 use Pest\Support\Coverage;
+use PestAnnotator\Data\ClassCoverage;
 use PestAnnotator\Data\CoverageReport;
 use PestAnnotator\Renderers\ComplexityRenderer;
 use PestAnnotator\Renderers\CoverageRenderer;
@@ -22,7 +23,10 @@ use PestAnnotator\Support\ComplexityAnalyzer;
 use PestAnnotator\Support\CoverageAnalyzer;
 use PestAnnotator\Support\DiffCalculator;
 use PestAnnotator\Support\TypeCoverageAnalyzer;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class Plugin implements AddsOutput, HandlesArguments
@@ -45,6 +49,13 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
 
         if ($this->hasAnyAnnotateFlag($argv) && in_array('--type-coverage', $argv, true)) {
             register_shutdown_function(function (): void {
+                // Pest's KernelDump starts an output buffer (ob_start) that
+                // captures and discards all output. We must end all active
+                // output buffering levels to restore normal output.
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
+
                 $this->renderTypeCoverageStandalone();
             });
         }
@@ -104,7 +115,21 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
 
     private function renderTypeCoverageStandalone(): void
     {
-        $this->renderTypeCoverageFromPaths($this->getSourceFilePaths());
+        $filePaths = $this->getSourceFilePaths();
+
+        if ($filePaths === []) {
+            return;
+        }
+
+        $analyzer = new TypeCoverageAnalyzer;
+        $typeReport = $analyzer->analyze($filePaths);
+
+        if ($typeReport->totalClasses() === 0) {
+            return;
+        }
+
+        $renderer = new TypeCoverageRenderer(showMethods: true);
+        $renderer->render($typeReport, $this->output);
     }
 
     /**
@@ -112,7 +137,7 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
      *
      * Used by handleOriginalArguments where the ArgumentParser hasn't parsed yet.
      *
-     * @param array<int, string> $arguments
+     * @param  array<int, string>  $arguments
      */
     private function hasAnyAnnotateFlag(array $arguments): bool
     {
@@ -147,22 +172,6 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         $renderer->render($report, $this->output);
     }
 
-    /** @param array<int, string> $filePaths */
-    private function renderTypeCoverageFromPaths(array $filePaths): void
-    {
-        if (! $this->parser->shouldShowTypes() || $filePaths === []) {
-            return;
-        }
-
-        $analyzer = new TypeCoverageAnalyzer;
-        $typeReport = $analyzer->analyze($filePaths);
-
-        $renderer = new TypeCoverageRenderer(
-            showMethods: $this->parser->shouldShowMethods(),
-        );
-        $renderer->render($typeReport, $this->output);
-    }
-
     /** @return array<int, string> */
     private function getSourceFilePaths(): array
     {
@@ -193,11 +202,11 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         $filePaths = [];
 
         foreach ($directories as $directory) {
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
             );
 
-            /** @var \SplFileInfo $file */
+            /** @var SplFileInfo $file */
             foreach ($iterator as $file) {
                 if ($file->isFile() && $file->getExtension() === 'php') {
                     $filePaths[] = $file->getRealPath();
