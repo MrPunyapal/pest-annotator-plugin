@@ -10,6 +10,8 @@ final class ArgumentParser
 {
     private bool $coverageEnabled = false;
 
+    private bool $typeCoverageEnabled = false;
+
     private bool $annotateEnabled = false;
 
     private bool $showMethods = false;
@@ -44,7 +46,31 @@ final class ArgumentParser
      */
     public function parse(array $arguments): array
     {
+        // --annotate-coverage[=N] is the plugin's own coverage trigger.
+        // It is consumed here, --coverage is injected so PHPUnit still collects
+        // coverage, and optionally a minimum threshold N is set in one flag.
+        $arguments = $this->extractValueFlag('--annotate-coverage', $arguments, callback: function (string $value): void {
+            $this->coverageEnabled = true;
+            $this->annotateEnabled = true;
+            $this->minCoverage = $value !== '' ? (int) $value : null;
+        });
+        $arguments = $this->detectFlag('--annotate-coverage', $arguments, consumed: true, callback: function (): void {
+            $this->coverageEnabled = true;
+            $this->annotateEnabled = true;
+        });
+        if ($this->coverageEnabled && ! in_array('--coverage', $arguments, true)) {
+            array_unshift($arguments, '--coverage');
+        }
+
         $arguments = $this->detectFlag('--coverage', $arguments, consumed: false, callback: fn (): true => $this->coverageEnabled = true);
+        $arguments = $this->detectFlag('--type-coverage', $arguments, consumed: false, callback: fn (): true => $this->typeCoverageEnabled = true);
+
+        // Pest's type-coverage plugin may consume --type-coverage before us,
+        // so also check the original argv as a fallback.
+        if (! $this->typeCoverageEnabled && in_array('--type-coverage', $_SERVER['argv'] ?? [], true)) {
+            $this->typeCoverageEnabled = true;
+        }
+
         $arguments = $this->detectFlag('--annotate', $arguments, consumed: true, callback: fn (): true => $this->annotateEnabled = true);
         $arguments = $this->detectFlag('--annotate-methods', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
@@ -53,10 +79,6 @@ final class ArgumentParser
         $arguments = $this->detectFlag('--annotate-covered', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
             $this->showCovered = true;
-        });
-        $arguments = $this->detectFlag('--annotate-types', $arguments, consumed: true, callback: function (): void {
-            $this->annotateEnabled = true;
-            $this->showTypes = true;
         });
         $arguments = $this->detectFlag('--annotate-complexity', $arguments, consumed: true, callback: function (): void {
             $this->annotateEnabled = true;
@@ -95,12 +117,21 @@ final class ArgumentParser
             $this->exportOutput = $value;
         });
 
+        if ($this->typeCoverageEnabled && $this->annotateEnabled) {
+            $this->showTypes = true;
+        }
+
         return array_values($arguments);
     }
 
     public function isCoverageEnabled(): bool
     {
         return $this->coverageEnabled;
+    }
+
+    public function isTypeCoverageEnabled(): bool
+    {
+        return $this->typeCoverageEnabled;
     }
 
     public function isAnnotateEnabled(): bool

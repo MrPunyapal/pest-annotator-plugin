@@ -19,32 +19,33 @@ composer require --dev mrpunyapal/pest-annotator-plugin
 Run Pest with coverage and any of the `--annotate-*` flags:
 
 ```bash
-./vendor/bin/pest --coverage --annotate
+./vendor/bin/pest --annotate-coverage
 ```
 
-Flags can be freely combined:
+Or combine individual flags with the standard `--coverage` flag:
 
 ```bash
-./vendor/bin/pest --coverage --annotate-methods --annotate-types --annotate-complexity
+./vendor/bin/pest --coverage --annotate-methods --annotate-complexity
 ```
 
 ---
 
 ## Flags Reference
 
+### All-in-one entry point
+
+| Flag                         | Description                                                         |
+|------------------------------|---------------------------------------------------------------------|
+| `--annotate-coverage`        | Enable coverage collection **and** class-level annotations in one flag. Replaces `--coverage --annotate`. |
+| `--annotate-coverage=N`      | Same as above, plus enforce a minimum coverage threshold of `N`%   |
+
 ### Coverage Annotations
 
 | Flag                  | Description                                                   |
 |-----------------------|---------------------------------------------------------------|
-| `--annotate`          | Show class-level coverage annotations                         |
+| `--annotate`          | Show class-level coverage annotations (requires `--coverage`) |
 | `--annotate-methods`  | Show per-method details with line numbers                     |
 | `--annotate-covered`  | Also include fully covered classes and methods in output      |
-
-### Type Coverage
-
-| Flag                  | Description                                                   |
-|-----------------------|---------------------------------------------------------------|
-| `--annotate-types`    | Analyse PHP files for missing return, parameter, and property types |
 
 ### Complexity Analysis
 
@@ -81,6 +82,10 @@ Flags can be freely combined:
 ### Basic coverage annotations
 
 ```bash
+# new single-flag form
+./vendor/bin/pest --annotate-coverage
+
+# classic form (still works)
 ./vendor/bin/pest --coverage --annotate
 ```
 
@@ -116,8 +121,10 @@ Flags can be freely combined:
 
 ### Type coverage analysis
 
+When using Pest's [type-coverage plugin](https://pestphp.com/docs/type-coverage), combine `--type-coverage` with `--annotate` to get annotated type coverage output:
+
 ```bash
-./vendor/bin/pest --coverage --annotate-types
+./vendor/bin/pest --type-coverage --annotate
 ```
 
 ```
@@ -128,6 +135,8 @@ Flags can be freely combined:
      missing return type: handle()
      missing param type:  handle() $request
 ```
+
+> **Note:** `--coverage` and `--type-coverage` are independent features and should not be used together.
 
 ### Complexity analysis
 
@@ -167,6 +176,10 @@ Save a baseline after a clean run, then compare on subsequent runs:
 ### Minimum coverage threshold
 
 ```bash
+# shorthand: enable coverage + annotations + threshold in one flag
+./vendor/bin/pest --annotate-coverage=80
+
+# explicit form (equivalent)
 ./vendor/bin/pest --coverage --annotate --annotate-min=80
 ```
 

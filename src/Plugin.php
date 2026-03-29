@@ -23,7 +23,10 @@ use PestAnnotator\Support\ComplexityAnalyzer;
 use PestAnnotator\Support\CoverageAnalyzer;
 use PestAnnotator\Support\DiffCalculator;
 use PestAnnotator\Support\TypeCoverageAnalyzer;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final readonly class Plugin implements AddsOutput, HandlesArguments
@@ -36,6 +39,26 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         private OutputInterface $output,
     ) {
         $this->parser = new ArgumentParser;
+
+        // Pest's type-coverage plugin calls exit() from handleOriginalArguments
+        // (which runs BEFORE handleArguments), so addOutput is never reached.
+        // The constructor is the earliest hook since ALL plugins are instantiated
+        // before ANY plugin methods are called. We check $_SERVER['argv'] directly
+        // because the ArgumentParser hasn't parsed yet.
+        $argv = $_SERVER['argv'] ?? [];
+
+        if ($this->hasAnyAnnotateFlag($argv) && in_array('--type-coverage', $argv, true)) {
+            register_shutdown_function(function (): void {
+                // Pest's KernelDump starts an output buffer (ob_start) that
+                // captures and discards all output. We must end all active
+                // output buffering levels to restore normal output.
+                while (ob_get_level() > 0) {
+                    ob_end_clean();
+                }
+
+                $this->renderTypeCoverageStandalone();
+            });
+        }
     }
 
     /** @param array<int, string> $arguments */
@@ -46,7 +69,7 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
 
     public function addOutput(int $exitCode): int
     {
-        if (! $this->parser->isCoverageEnabled() || ! $this->parser->isAnnotateEnabled() || $exitCode !== 0) {
+        if (! $this->parser->isAnnotateEnabled()) {
             return $exitCode;
         }
 
@@ -54,6 +77,15 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
             return $exitCode;
         }
 
+        if ($this->parser->isCoverageEnabled() && $exitCode === 0) {
+            return $this->handleCoverageOutput($exitCode);
+        }
+
+        return $exitCode;
+    }
+
+    private function handleCoverageOutput(int $exitCode): int
+    {
         $coveragePath = Coverage::getPath();
 
         if (! file_exists($coveragePath)) {
@@ -73,13 +105,49 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         }
 
         $this->renderCoverage($report);
-        $this->renderTypeCoverage($report);
         $this->renderComplexity($report);
         $this->handleBaseline($report);
         $this->renderDiff($report);
         $this->export($report);
 
         return $this->enforceThreshold($report, $exitCode);
+    }
+
+    private function renderTypeCoverageStandalone(): void
+    {
+        $filePaths = $this->getSourceFilePaths();
+
+        if ($filePaths === []) {
+            return;
+        }
+
+        $analyzer = new TypeCoverageAnalyzer;
+        $typeReport = $analyzer->analyze($filePaths);
+
+        if ($typeReport->totalClasses() === 0) {
+            return;
+        }
+
+        $renderer = new TypeCoverageRenderer(showMethods: true);
+        $renderer->render($typeReport, $this->output);
+    }
+
+    /**
+     * Checks if any --annotate flag is present in the argument list.
+     *
+     * Used by handleOriginalArguments where the ArgumentParser hasn't parsed yet.
+     *
+     * @param  array<int, string>  $arguments
+     */
+    private function hasAnyAnnotateFlag(array $arguments): bool
+    {
+        foreach ($arguments as $argument) {
+            if (str_starts_with($argument, '--annotate')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function applyFilters(CoverageReport $report): CoverageReport
@@ -104,24 +172,49 @@ final readonly class Plugin implements AddsOutput, HandlesArguments
         $renderer->render($report, $this->output);
     }
 
-    private function renderTypeCoverage(CoverageReport $report): void
+    /** @return array<int, string> */
+    private function getSourceFilePaths(): array
     {
-        if (! $this->parser->shouldShowTypes()) {
-            return;
+        $composerJsonPath = getcwd().'/composer.json';
+
+        if (! file_exists($composerJsonPath)) {
+            return [];
         }
 
-        $filePaths = array_values(array_unique(array_map(
-            static fn (ClassCoverage $class): string => $class->filePath,
-            $report->classes,
-        )));
+        /** @var array{autoload?: array{psr-4?: array<string, string|array<int, string>>}} $composer */
+        $composer = json_decode((string) file_get_contents($composerJsonPath), true);
 
-        $analyzer = new TypeCoverageAnalyzer;
-        $typeReport = $analyzer->analyze($filePaths);
+        $directories = [];
 
-        $renderer = new TypeCoverageRenderer(
-            showMethods: $this->parser->shouldShowMethods(),
-        );
-        $renderer->render($typeReport, $this->output);
+        foreach ($composer['autoload']['psr-4'] ?? [] as $paths) {
+            foreach ((array) $paths as $path) {
+                $fullPath = getcwd().'/'.$path;
+                if (is_dir($fullPath)) {
+                    $directories[] = $fullPath;
+                }
+            }
+        }
+
+        if ($directories === []) {
+            return [];
+        }
+
+        $filePaths = [];
+
+        foreach ($directories as $directory) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            );
+
+            /** @var SplFileInfo $file */
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    $filePaths[] = $file->getRealPath();
+                }
+            }
+        }
+
+        return $filePaths;
     }
 
     private function renderComplexity(CoverageReport $report): void

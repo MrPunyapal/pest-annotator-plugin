@@ -29,12 +29,32 @@ it('parses --annotate-covered flag', function (): void {
         ->and($parser->shouldShowCovered())->toBeTrue();
 });
 
-it('parses --annotate-types flag', function (): void {
+it('enables type coverage when --type-coverage and --annotate are both present', function (): void {
     $parser = new ArgumentParser;
-    $parser->parse(['--coverage', '--annotate-types']);
+    $result = $parser->parse(['--type-coverage', '--annotate']);
 
     expect($parser->isAnnotateEnabled())->toBeTrue()
-        ->and($parser->shouldShowTypes())->toBeTrue();
+        ->and($parser->isTypeCoverageEnabled())->toBeTrue()
+        ->and($parser->shouldShowTypes())->toBeTrue()
+        ->and($result)->toContain('--type-coverage');
+});
+
+it('does not enable type coverage with --type-coverage alone', function (): void {
+    $parser = new ArgumentParser;
+    $parser->parse(['--type-coverage']);
+
+    expect($parser->isTypeCoverageEnabled())->toBeTrue()
+        ->and($parser->isAnnotateEnabled())->toBeFalse()
+        ->and($parser->shouldShowTypes())->toBeFalse();
+});
+
+it('does not enable type coverage with --annotate alone', function (): void {
+    $parser = new ArgumentParser;
+    $parser->parse(['--coverage', '--annotate']);
+
+    expect($parser->isAnnotateEnabled())->toBeTrue()
+        ->and($parser->isTypeCoverageEnabled())->toBeFalse()
+        ->and($parser->shouldShowTypes())->toBeFalse();
 });
 
 it('parses --annotate-complexity flag', function (): void {
